@@ -32,12 +32,25 @@ const Buy = () => {
         }
 
         // var radio = document.getElementsByName('inlineRadioOptionsS4L');
-        console.log(ans);
+
+
+        // console.log(ans);
+
+        fetch('http://localhost:5000/app', {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer abcdxyz',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ans
+            }),
+        })
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => console.log(data));
     };
-
-
-
-
 
     return <>
         <form onSubmit={getResult}>
