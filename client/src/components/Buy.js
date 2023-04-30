@@ -1,13 +1,15 @@
-import AudioFile1 from './music/song1.mp3'
-import AudioFile2 from './music/song2.mp3'
-import AudioFile3 from './music/song3.mp3'
-import AudioFile4 from './music/song4.mp3'
-import AudioFile5 from './music/song5.mp3'
-const Buy = () => {
+import AudioFile1 from './music/song1.mp3';
+import AudioFile2 from './music/song2.mp3';
+import AudioFile3 from './music/song3.mp3';
+import AudioFile4 from './music/song4.mp3';
+import AudioFile5 from './music/song5.mp3';
+import { ethers } from "ethers";
+const Buy = ({ state }) => {
 
     const getResult = async (event) => {
         event.preventDefault();
         var ans = [];
+        var resultData;
         for (var i = 1; i <= 5; i++) {
             var radio1 = document.getElementsByName('inlineRadioOptionsS' + i + 'S');
             for (var j = 0; j < 5; j++) {
@@ -36,7 +38,7 @@ const Buy = () => {
 
         // console.log(ans);
 
-        fetch('http://localhost:5000/app', {
+        const postResult = await fetch('http://localhost:5000/app', {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer abcdxyz',
@@ -50,6 +52,36 @@ const Buy = () => {
                 return res.json();
             })
             .then((data) => console.log(data));
+
+        const getResult = await fetch('http://localhost:5000/app', {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer abcdxyz',
+                'Content-Type': 'application/json',
+            }
+        })
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => {
+                resultData = data;
+                console.log(resultData)
+            });
+
+        console.log(typeof (resultData.values[0][0]));
+
+        const { contract } = state;
+        console.log(contract);
+
+        const amount = { value: ethers.utils.parseEther("0.001") };
+        const w = ethers.BigNumber.from(resultData.values[0][0]);
+        const x = ethers.BigNumber.from(resultData.values[0][1]);
+        const y = ethers.BigNumber.from(resultData.values[0][2]);
+        const z = ethers.BigNumber.from(resultData.values[0][3]);
+
+        const transaction = await contract.payEth(w, x, y, z, amount);
+        await transaction.wait();
+        console.log("transaction is done");
     };
 
     return <>

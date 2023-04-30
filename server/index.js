@@ -99,6 +99,36 @@ router.post('/app', async (req, res) => {
 
     res.send(getRows.data);
 });
+
+router.get('/app', async (req, res) => {
+    const auth = new google.auth.GoogleAuth({
+        keyFile: "credential.json",
+        scopes: "https://www.googleapis.com/auth/spreadsheets",
+    })
+    //create client instance for auth
+    const client = await auth.getClient();
+
+    //Instance og Google Sheets API
+    const googleSheets = google.sheets({ version: "v4", auth: client });
+
+    const spreadsheetId = "1k1woJcmKP23RQqzU3rgF7no6xhaRWp6tGoS1dZzURuU";
+
+    //get meta data about spreadsheet
+    const metaData = await googleSheets.spreadsheets.get({
+        auth,
+        spreadsheetId,
+    });
+
+    const getRows = await googleSheets.spreadsheets.values.get({
+        auth,
+        spreadsheetId,
+        range: "Sheet1!B87:E87",
+    })
+    res.send(getRows.data);
+});
+
+
+
 //add the router 
 app.use('/', router);
 app.listen(process.env.port || 5000);
